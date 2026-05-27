@@ -1,0 +1,30 @@
+name: Azure Infrastructure CICD
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-cicd:
+    name: Check/Build Terraform CICD
+    runs-on: ubuntu-latest
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_grafana_admin_password: ${{secrets.GRAFANA_ADMIN_PASSWORD}}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Run terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform apply -auto-approve
