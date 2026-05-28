@@ -195,7 +195,6 @@ resource "azurerm_container_app" "report_app" {
     volume {
       name         = "alloy-config-volume"
       storage_type = "Secret"
-      secret_name  = "alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}"
     }
 
     volume {
@@ -317,7 +316,6 @@ resource "azurerm_container_app" "ingest_app" {
     volume {
       name         = "alloy-config-volume"
       storage_type = "Secret"
-      secret_name  = "alloy-config-${substr(sha1(file("${path.module}/data-ingest-config.alloy")), 0, 7)}"
     }
 
     volume {
@@ -516,7 +514,6 @@ resource "azurerm_container_app" "prometheus" {
     volume {
       name         = "prometheus-config-volume"
       storage_type = "Secret"
-      secret_name  = "prometheus-config-secret"
     }
   }
 
