@@ -96,7 +96,7 @@ resource "azurerm_container_app" "report_app" {
   }
 
   secret {
-    name  = "alloy-config-secret"
+    name  = "alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}"
     value = file("${path.module}/report-config.alloy")
   }
 
@@ -210,7 +210,7 @@ resource "azurerm_container_app" "ingest_app" {
   }
 
   secret {
-    name  = "alloy-config-secret"
+    name  = "alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}"
     value = file("${path.module}/data-ingest-config.alloy")
   }
 
@@ -411,7 +411,40 @@ resource "azurerm_container_app" "loki" {
   ingress {
     external_enabled = false
     target_port      = 3100
-    transport = "http"
+    transport        = "http"
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
+  }
+}
+
+resource "azurerm_container_app" "prometheus" {
+  container_app_environment_id = azurerm_container_app_environment.environment.id
+  name                         = "app-prometheus-service"
+  resource_group_name          = var.resource_group_name
+  revision_mode                = "Single"
+
+  template {
+    container {
+      cpu    = 0.25
+      memory = "0.5Gi"
+      name   = "prometheus"
+      image  = "prom/prometheus:latest"
+
+      args = [
+        "--config.file=/etc/prometheus/prometheus.yml",
+        "--web.enable-remote-write-receiver"
+      ]
+    }
+    min_replicas = 1
+    max_replicas = 1
+  }
+
+  ingress {
+    external_enabled = false
+    target_port      = 9090
+    transport        = "http"
     traffic_weight {
       latest_revision = true
       percentage      = 100
