@@ -178,7 +178,7 @@ resource "azurerm_container_app" "report_app" {
 
       args = [
         "run",
-        "/etc/alloy/config.alloy",
+        "/etc/alloy/alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}",
         "--storage.path=/tmp/alloy-data"
       ]
 
@@ -196,6 +196,9 @@ resource "azurerm_container_app" "report_app" {
     volume {
       name         = "alloy-config-volume"
       storage_type = "Secret"
+      secrets = [
+        "alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}"
+      ]
     }
 
     volume {
@@ -300,7 +303,7 @@ resource "azurerm_container_app" "ingest_app" {
 
       args = [
         "run",
-        "/etc/alloy/config.alloy",
+        "/etc/alloy/alloy-config-${substr(sha1(file("${path.module}/data-ingest-config.alloy")), 0, 7)}",
         "--storage.path=/tmp/alloy-data"
       ]
 
@@ -317,6 +320,9 @@ resource "azurerm_container_app" "ingest_app" {
     volume {
       name         = "alloy-config-volume"
       storage_type = "Secret"
+      secrets = [
+        "alloy-config-${substr(sha1(file("${path.module}/data-ingest-config.alloy")), 0, 7)}"
+      ]
     }
 
     volume {
@@ -488,7 +494,7 @@ resource "azurerm_container_app" "prometheus" {
   revision_mode                = "Single"
 
   secret {
-    name  = "prometheus-config-secret"
+    name  = "prometheus-config-${substr(sha1(file("${path.module}/prometheus.yml")), 0, 7)}"
     value = file("${path.module}/prometheus.yml")
   }
 
@@ -500,7 +506,7 @@ resource "azurerm_container_app" "prometheus" {
       image  = "prom/prometheus:latest"
 
       args = [
-        "--config.file=/etc/prometheus/config.yml",
+        "--config.file=/etc/prometheus/prometheus-config-${substr(sha1(file("${path.module}/prometheus.yml")), 0, 7)}",
         "--web.enable-remote-write-receiver"
       ]
 
@@ -515,6 +521,9 @@ resource "azurerm_container_app" "prometheus" {
     volume {
       name         = "prometheus-config-volume"
       storage_type = "Secret"
+      secrets = [
+        "prometheus-config-${substr(sha1(file("${path.module}/prometheus.yml")), 0, 7)}"
+      ]
     }
   }
 
