@@ -391,18 +391,12 @@ resource "azurerm_container_app" "grafana" {
 
       env {
         name  = "GF_SECURITY_COOKIE_SAMESITE"
-        value = "none"
+        value = "lax"
       }
 
       env {
         name  = "GF_SECURITY_COOKIE_SECURE"
         value = "true"
-      }
-
-      # test
-      env {
-        name  = "GF_SECURITY_SECRET_KEY"
-        value = "KMS_Training_Secret_Key_Super_Secure_123456789_A@B"
       }
 
       env {
