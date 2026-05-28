@@ -97,7 +97,6 @@ resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_postgresql_flexible_server_active_directory_administrator" "entra_admin" {
-  server_id           = azurerm_postgresql_flexible_server.postgres_grafana.id
   resource_group_name = var.resource_group_name
   object_id           = data.azuread_service_principal.github_spn.object_id
   principal_name      = "github-rooftop-kms"
