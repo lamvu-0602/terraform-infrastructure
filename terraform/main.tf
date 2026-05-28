@@ -452,8 +452,23 @@ resource "azurerm_container_app" "prometheus" {
   }
 }
 
+data "azuread_service_principal" "github_spn" {
+  client_id = "b42fcaa9-18ae-4e77-9dfc-3f1dbbedabcc"
+}
+
+data "azurerm_storage_account" "asa_bootstrap" {
+  name                = var.storage_account_name
+  resource_group_name = var.resource_group_name
+}
+
 resource "azurerm_role_assignment" "report-service-eventhub" {
   principal_id         = azurerm_container_app.report_app.identity[0].principal_id
+  scope                = azurerm_eventhub.aeh.id
+  role_definition_name = "Azure Event Hubs Data Sender"
+}
+
+resource "azurerm_role_assignment" "github_spn-report-service-eventhub" {
+  principal_id         = data.azuread_service_principal.github_spn.object_id
   scope                = azurerm_eventhub.aeh.id
   role_definition_name = "Azure Event Hubs Data Sender"
 }
@@ -464,14 +479,32 @@ resource "azurerm_role_assignment" "data-ingest-service-eventhub" {
   role_definition_name = "Azure Event Hubs Data Receiver"
 }
 
+resource "azurerm_role_assignment" "github_spn-data-ingest-service-eventhub" {
+  principal_id         = data.azuread_service_principal.github_spn.object_id
+  scope                = azurerm_eventhub.aeh.id
+  role_definition_name = "Azure Event Hubs Data Receiver"
+}
+
 resource "azurerm_role_assignment" "report-service-acr" {
   principal_id         = azurerm_container_app.report_app.identity[0].principal_id
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
 }
 
+resource "azurerm_role_assignment" "github_spn-report-service-acr" {
+  principal_id         = data.azuread_service_principal.github_spn.object_id
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+}
+
 resource "azurerm_role_assignment" "data-ingest-service-eventhub-acr" {
   principal_id         = azurerm_container_app.ingest_app.identity[0].principal_id
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+}
+
+resource "azurerm_role_assignment" "github_spn-data-ingest-service-eventhub-acr" {
+  principal_id         = data.azuread_service_principal.github_spn.object_id
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
 }
@@ -484,10 +517,6 @@ resource "azurerm_cosmosdb_sql_role_assignment" "data-ingest-service-cosmos" {
   scope               = azurerm_cosmosdb_account.cosmos.id
 }
 
-data "azuread_service_principal" "github_spn" {
-  client_id = "b42fcaa9-18ae-4e77-9dfc-3f1dbbedabcc"
-}
-
 resource "azurerm_cosmosdb_sql_role_assignment" "spn_cosmos_read_write_dynamic" {
   resource_group_name = var.resource_group_name
   account_name        = azurerm_cosmosdb_account.cosmos.name
@@ -496,11 +525,6 @@ resource "azurerm_cosmosdb_sql_role_assignment" "spn_cosmos_read_write_dynamic" 
   role_definition_id = "${azurerm_cosmosdb_account.cosmos.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
 
   principal_id = data.azuread_service_principal.github_spn.object_id
-}
-
-data "azurerm_storage_account" "asa_bootstrap" {
-  name                = var.storage_account_name
-  resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_storage_container" "eventhub_checkpoint" {
@@ -529,10 +553,8 @@ resource "azurerm_role_assignment" "report-service-blob" {
 
 resource "azurerm_role_assignment" "spn_storage_blob_data_contributor" {
   scope                = data.azurerm_storage_account.asa_bootstrap.id
-
   role_definition_name = "Storage Blob Data Contributor"
-
-  principal_id        = data.azuread_service_principal.github_spn.object_id
+  principal_id         = data.azuread_service_principal.github_spn.object_id
 }
 
 output "acr_login_server" {
