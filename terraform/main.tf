@@ -374,6 +374,11 @@ resource "azurerm_container_app" "grafana" {
         value = "KMS_Training_Secret_Key_Super_Secure_123456789_A@B"
       }
 
+      env {
+        name  = "GF_DATABASE_WAL"
+        value = "true"
+      }
+
       volume_mounts {
         name = "grafana-storage-volume"
         path = "/var/lib/grafana"
