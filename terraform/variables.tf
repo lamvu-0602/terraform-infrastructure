@@ -34,6 +34,8 @@ variable "postgres_user" {
   default = "grafanaadmin"
 }
 
-variable "postgres_password" {
+variable "grafana_postgres_password" {
+  type        = string
+  description = "Postgres password"
   sensitive = true
 }

@@ -90,7 +90,7 @@ resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
   zone         = "1"
 
   administrator_login    = "grafanaadmin"
-  administrator_password = var.postgres_password
+  administrator_password = var.grafana_postgres_password
 
   authentication {
     active_directory_auth_enabled = true
@@ -420,7 +420,7 @@ resource "azurerm_container_app" "grafana" {
       }
       env {
         name  = "GF_DATABASE_PASSWORD"
-        value = var.postgres_password
+        value = var.grafana_postgres_password
       }
       env {
         name  = "GF_DATABASE_SSL_MODE"
