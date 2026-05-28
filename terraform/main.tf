@@ -92,8 +92,6 @@ resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
     active_directory_auth_enabled = true
     password_auth_enabled         = false
   }
-
-  high_availability { mode = "Disabled" }
 }
 
 data "azurerm_client_config" "current" {}
