@@ -87,6 +87,7 @@ resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
   sku_name            = "B_Standard_B1ms"
   storage_mb          = 32768
   storage_tier        = "P4"
+  zone                = "1"
 
   authentication {
     active_directory_auth_enabled = true
