@@ -80,13 +80,13 @@ resource "azurerm_cosmosdb_sql_container" "acsql_container" {
 }
 
 resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
-  name                   = "pg-rooftop-kms-grafana"
-  resource_group_name    = var.resource_group_name
-  location               = var.location
-  version                = "14"
-  sku_name               = "B_Standard_B1ms"
-  storage_mb             = 32768
-  storage_tier           = "P4"
+  name                = "pg-rooftop-kms-grafana"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  version             = "14"
+  sku_name            = "B_Standard_B1ms"
+  storage_mb          = 32768
+  storage_tier        = "P4"
 
   authentication {
     active_directory_auth_enabled = true
@@ -177,7 +177,7 @@ resource "azurerm_container_app" "report_app" {
 
       args = [
         "run",
-        "/etc/alloy/alloy-config-secret",
+        "/etc/alloy/config.alloy",
         "--storage.path=/tmp/alloy-data"
       ]
 
@@ -195,6 +195,7 @@ resource "azurerm_container_app" "report_app" {
     volume {
       name         = "alloy-config-volume"
       storage_type = "Secret"
+      secret_name  = "alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}"
     }
 
     volume {
@@ -236,7 +237,7 @@ resource "azurerm_container_app" "ingest_app" {
   }
 
   secret {
-    name  = "alloy-config-${substr(sha1(file("${path.module}/report-config.alloy")), 0, 7)}"
+    name  = "alloy-config-${substr(sha1(file("${path.module}/data-ingest-config.alloy")), 0, 7)}"
     value = file("${path.module}/data-ingest-config.alloy")
   }
 
@@ -299,7 +300,7 @@ resource "azurerm_container_app" "ingest_app" {
 
       args = [
         "run",
-        "/etc/alloy/alloy-config-secret",
+        "/etc/alloy/config.alloy",
         "--storage.path=/tmp/alloy-data"
       ]
 
@@ -316,6 +317,7 @@ resource "azurerm_container_app" "ingest_app" {
     volume {
       name         = "alloy-config-volume"
       storage_type = "Secret"
+      secret_name  = "alloy-config-${substr(sha1(file("${path.module}/data-ingest-config.alloy")), 0, 7)}"
     }
 
     volume {
@@ -486,6 +488,11 @@ resource "azurerm_container_app" "prometheus" {
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
+  secret {
+    name  = "prometheus-config-secret"
+    value = file("${path.module}/prometheus.yml")
+  }
+
   template {
     container {
       cpu    = 0.25
@@ -494,12 +501,23 @@ resource "azurerm_container_app" "prometheus" {
       image  = "prom/prometheus:latest"
 
       args = [
-        "--config.file=/etc/prometheus/prometheus.yml",
+        "--config.file=/etc/prometheus/config.yml",
         "--web.enable-remote-write-receiver"
       ]
+
+      volume_mounts {
+        name = "prometheus-config-volume"
+        path = "/etc/prometheus"
+      }
     }
     min_replicas = 1
     max_replicas = 1
+
+    volume {
+      name         = "prometheus-config-volume"
+      storage_type = "Secret"
+      secret_name  = "prometheus-config-secret"
+    }
   }
 
   ingress {
