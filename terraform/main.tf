@@ -374,6 +374,16 @@ resource "azurerm_container_app" "grafana" {
         value = "KMS_Training_Secret_Key_Super_Secure_123456789_A@B"
       }
 
+      volume_mounts {
+        name = "grafana-storage-volume"
+        path = "/var/lib/grafana"
+      }
+    }
+
+    volume {
+      name         = "grafana-storage-volume"
+      storage_type = "AzureFile"
+      storage_name = azurerm_container_app_environment_storage.environment_share.name
     }
   }
 
@@ -555,6 +565,21 @@ resource "azurerm_role_assignment" "spn_storage_blob_data_contributor" {
   scope                = data.azurerm_storage_account.asa_bootstrap.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = data.azuread_service_principal.github_spn.object_id
+}
+
+resource "azurerm_storage_share" "grafana_storage" {
+  name               = "grafana-data-share"
+  storage_account_id = data.azurerm_storage_account.asa_bootstrap.id
+  quota              = 1
+}
+
+resource "azurerm_container_app_environment_storage" "environment_share" {
+  name                         = "grafana-secure-volume"
+  container_app_environment_id = azurerm_container_app_environment.environment.id
+  account_name                 = data.azurerm_storage_account.asa_bootstrap.name
+  access_key                   = data.azurerm_storage_account.asa_bootstrap.primary_access_key
+  share_name                   = azurerm_storage_share.grafana_storage.name
+  access_mode                  = "ReadWrite"
 }
 
 output "acr_login_server" {
