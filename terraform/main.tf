@@ -98,6 +98,13 @@ resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
   }
 }
 
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure" {
+  name             = "allow-azure-services"
+  server_id        = azurerm_postgresql_flexible_server.postgres_grafana.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_postgresql_flexible_server_active_directory_administrator" "entra_admin" {
