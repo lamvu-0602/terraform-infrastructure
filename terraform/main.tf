@@ -79,6 +79,35 @@ resource "azurerm_cosmosdb_sql_container" "acsql_container" {
   resource_group_name   = var.resource_group_name
 }
 
+resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
+  name                   = "pg-rooftop-kms-grafana"
+  resource_group_name    = var.resource_group_name
+  location               = var.location
+  version                = "14"
+  sku_name               = "B_Standard_B1ms"
+  storage_mb             = 32768
+  storage_tier           = "P4"
+
+  authentication {
+    active_directory_auth_enabled = true
+    password_auth_enabled         = false
+  }
+
+  high_availability { mode = "Disabled" }
+}
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "entra_admin" {
+  server_id           = azurerm_postgresql_flexible_server.postgres_grafana.id
+  resource_group_name = var.resource_group_name
+  object_id           = data.azuread_service_principal.github_spn.object_id
+  principal_name      = "github-rooftop-kms"
+  principal_type      = "ServicePrincipal"
+  server_name         = azurerm_postgresql_flexible_server.postgres_grafana.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+}
+
 resource "azurerm_container_app_environment" "environment" {
   location            = var.location
   name                = "rooftop-kms-enviroment"
@@ -316,6 +345,10 @@ resource "azurerm_container_app" "grafana" {
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   template {
     container {
       cpu    = 0.5
@@ -375,8 +408,24 @@ resource "azurerm_container_app" "grafana" {
       }
 
       env {
-        name  = "GF_DATABASE_WAL"
-        value = "true"
+        name  = "GF_DATABASE_TYPE"
+        value = "postgres"
+      }
+      env {
+        name  = "GF_DATABASE_HOST"
+        value = "${azurerm_postgresql_flexible_server.postgres_grafana.fqdn}:5432"
+      }
+      env {
+        name  = "GF_DATABASE_NAME"
+        value = "grafana_db"
+      }
+      env {
+        name  = "GF_DATABASE_USER"
+        value = "app-grafana-service"
+      }
+      env {
+        name  = "GF_DATABASE_SSL_MODE"
+        value = "require"
       }
 
       volume_mounts {
