@@ -484,6 +484,20 @@ resource "azurerm_cosmosdb_sql_role_assignment" "data-ingest-service-cosmos" {
   scope               = azurerm_cosmosdb_account.cosmos.id
 }
 
+data "azuread_service_principal" "github_spn" {
+  client_id = "b42fcaa9-18ae-4e77-9dfc-3f1dbbedabcc"
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "spn_cosmos_read_write_dynamic" {
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.cosmos.name
+  scope               = azurerm_cosmosdb_account.cosmos.id
+
+  role_definition_id = "${azurerm_cosmosdb_account.cosmos.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+
+  principal_id = data.azuread_service_principal.github_spn.object_id
+}
+
 data "azurerm_storage_account" "asa_bootstrap" {
   name                = var.storage_account_name
   resource_group_name = var.resource_group_name
