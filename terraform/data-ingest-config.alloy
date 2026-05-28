@@ -17,7 +17,7 @@ loki.write "loki_service" {
 prometheus.scrape "java_metrics" {
   targets = [{
     "__address__" = "localhost:8081",
-    "service"     = "data-ingest-service"
+    "service"     = "data-ingest-service",
   }]
 
   metrics_path = "/actuator/prometheus"
