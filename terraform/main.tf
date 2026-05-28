@@ -527,6 +527,14 @@ resource "azurerm_role_assignment" "report-service-blob" {
   role_definition_name = "Storage Blob Data Contributor"
 }
 
+resource "azurerm_role_assignment" "spn_storage_blob_data_contributor" {
+  scope                = data.azurerm_storage_account.asa_bootstrap.id
+
+  role_definition_name = "Storage Blob Data Contributor"
+
+  principal_id        = data.azuread_service_principal.github_spn.object_id
+}
+
 output "acr_login_server" {
   value = azurerm_container_registry.acr.login_server
 }
