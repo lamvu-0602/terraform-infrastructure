@@ -83,15 +83,18 @@ resource "azurerm_postgresql_flexible_server" "postgres_grafana" {
   name                = "pg-rooftop-kms-grafana"
   resource_group_name = var.resource_group_name
   location            = var.location
-  version             = "14"
-  sku_name            = "B_Standard_B1ms"
-  storage_mb          = 32768
-  storage_tier        = "P4"
-  zone                = "1"
+  version      = "14"
+  sku_name     = "B_Standard_B1ms"
+  storage_mb   = 32768
+  storage_tier = "P4"
+  zone         = "1"
+
+  administrator_login    = "grafanaadmin"
+  administrator_password = var.postgres_password
 
   authentication {
     active_directory_auth_enabled = true
-    password_auth_enabled         = false
+    password_auth_enabled         = true
   }
 }
 
@@ -413,7 +416,11 @@ resource "azurerm_container_app" "grafana" {
       }
       env {
         name  = "GF_DATABASE_USER"
-        value = "app-grafana-service"
+        value = "grafanaadmin"
+      }
+      env {
+        name  = "GF_DATABASE_PASSWORD"
+        value = var.postgres_password
       }
       env {
         name  = "GF_DATABASE_SSL_MODE"
