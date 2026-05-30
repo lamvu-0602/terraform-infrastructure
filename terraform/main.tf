@@ -275,6 +275,10 @@ resource "azurerm_container_app" "ingest_app" {
         value = azurerm_eventhub.aeh.name
       }
       env {
+        name  = "EVENTHUB_GROUP"
+        value = azurerm_eventhub_consumer_group.report_group.name
+      }
+      env {
         name  = "COSMOS_ENDPOINT"
         value = azurerm_cosmosdb_account.cosmos.endpoint
       }
