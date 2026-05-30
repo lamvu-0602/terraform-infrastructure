@@ -150,6 +150,11 @@ resource "azurerm_container_app" "report_app" {
       }
 
       env {
+        name = "JWT_TOKEN_SIGNING_KEY"
+        value = var.report_service_token_signing_key
+      }
+
+      env {
         name  = "AZURE_STORAGE_BLOB_ENDPOINT"
         value = "https://${var.storage_account_name}.blob.core.windows.net/"
       }

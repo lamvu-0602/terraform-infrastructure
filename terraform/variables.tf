@@ -39,3 +39,9 @@ variable "grafana_postgres_password" {
   description = "Postgres password"
   sensitive = true
 }
+
+variable "report_service_token_signing_key" {
+  type        = string
+  description = "Jwt secret key"
+  sensitive = true
+}
