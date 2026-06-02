@@ -4,9 +4,9 @@ resource "azurerm_container_app" "auth_app" {
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
-  # identity {
-  #   type = "SystemAssigned"
-  # }
+  identity {
+    type = "SystemAssigned"
+  }
 
   secret {
     name  = "alloy-config-${substr(sha1(var.alloy_config), 0, 7)}"
