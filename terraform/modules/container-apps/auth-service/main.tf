@@ -4,9 +4,9 @@ resource "azurerm_container_app" "auth_app" {
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
-  identity {
-    type = "SystemAssigned"
-  }
+  # identity {
+  #   type = "SystemAssigned"
+  # }
 
   secret {
     name  = "alloy-config-${substr(sha1(var.alloy_config), 0, 7)}"
@@ -37,8 +37,9 @@ resource "azurerm_container_app" "auth_app" {
     min_replicas = 0
     max_replicas = 10
     container {
-      cpu    = 0.5
-      image  = "${var.acr_login_server}/auth-service:latest"
+      cpu = 0.5
+      # image  = "${var.acr_login_server}/auth-service:latest"
+      image  = "docker.io/library/nginx:latest"
       memory = "1.0Gi"
       name   = "auth-service"
 
@@ -109,7 +110,8 @@ resource "azurerm_container_app" "auth_app" {
 
   ingress {
     external_enabled = true
-    target_port      = 8082
+    # target_port      = 8082
+    target_port = 80
 
     traffic_weight {
       latest_revision = true
@@ -117,8 +119,8 @@ resource "azurerm_container_app" "auth_app" {
     }
   }
 
-  registry {
-    server   = var.acr_login_server
-    identity = "system"
-  }
+  # registry {
+  #   server   = var.acr_login_server
+  #   identity = "system"
+  # }
 }
