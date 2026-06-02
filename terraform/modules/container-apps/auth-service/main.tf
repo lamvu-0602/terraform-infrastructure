@@ -38,7 +38,7 @@ resource "azurerm_container_app" "auth_app" {
     max_replicas = 10
     container {
       cpu    = 0.5
-      image  = "${var.acr_login_server}/auth-service:latest"
+      image  = "${var.acr_login_server}/report-service:latest"
       memory = "1.0Gi"
       name   = "auth-service"
 
