@@ -31,7 +31,7 @@ resource "azurerm_container_app" "ingest_app" {
         activationUnprocessedEventThreshold = "0"
       }
 
-      identity_id = "system"
+      identity = "System"
     }
     container {
       cpu    = 0.5
