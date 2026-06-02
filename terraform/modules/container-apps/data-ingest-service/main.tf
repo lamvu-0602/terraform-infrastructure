@@ -14,6 +14,25 @@ resource "azurerm_container_app" "ingest_app" {
   }
 
   template {
+    min_replicas = 0
+    max_replicas = 10
+    custom_scale_rule {
+      name             = "eventhub-scale-rule"
+      custom_rule_type = "azure-eventhub"
+
+      metadata = {
+        eventHubNamespace                 = var.eventhub_namespace_name
+        eventHubName                      = var.eventhub_name
+        consumerGroup                     = var.eventhub_consumer_group_name
+        storageAccountName                = var.storage_account_name
+        blobContainer                     = var.eventhub_checkpoint_container_name
+        checkpointStrategy                = "blobMetadata"
+        unprocessedEventThreshold         = "1"
+        activationUnprocessedEventThreshold = "0"
+      }
+
+      identity_id = "system"
+    }
     container {
       cpu    = 0.5
       image  = "${var.acr_login_server}/data-ingest-service:latest"
