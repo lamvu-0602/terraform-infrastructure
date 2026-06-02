@@ -28,7 +28,7 @@ resource "azurerm_container_app" "prometheus" {
     }
 
     min_replicas = 1
-    max_replicas = 1
+    max_replicas = 2
 
     volume {
       name         = "prometheus-config-volume"

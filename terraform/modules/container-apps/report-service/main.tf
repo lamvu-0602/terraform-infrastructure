@@ -14,6 +14,8 @@ resource "azurerm_container_app" "report_app" {
   }
 
   template {
+    min_replicas = 0
+    max_replicas = 10
     container {
       cpu    = 0.5
       image  = "${var.acr_login_server}/report-service:latest"

@@ -9,6 +9,8 @@ resource "azurerm_container_app" "grafana" {
   }
 
   template {
+    min_replicas = 0
+    max_replicas = 5
     container {
       cpu    = 0.5
       image  = "grafana/grafana:latest"
