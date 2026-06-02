@@ -6,6 +6,10 @@ variable "report_app_principal_id" {
   type = string
 }
 
+variable "auth_app_principal_id" {
+  type = string
+}
+
 variable "ingest_app_principal_id" {
   type = string
 }

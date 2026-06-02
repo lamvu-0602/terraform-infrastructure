@@ -19,6 +19,10 @@ variable "report_service_token_signing_key" {
   sensitive = true
 }
 
+variable "jwt_jwk_set_uri" {
+  type = string
+}
+
 variable "report_files_container_name" {
   type = string
 }

@@ -46,6 +46,30 @@ variable "report_service_token_signing_key" {
   sensitive   = true
 }
 
+variable "auth_user_username" {
+  type        = string
+  description = "Auth service bootstrap username"
+  sensitive   = true
+}
+
+variable "auth_user_password" {
+  type        = string
+  description = "Auth service bootstrap password"
+  sensitive   = true
+}
+
+variable "auth_jwt_public_key" {
+  type        = string
+  description = "Auth service JWT public key"
+  sensitive   = true
+}
+
+variable "auth_jwt_private_key" {
+  type        = string
+  description = "Auth service JWT private key"
+  sensitive   = true
+}
+
 variable "service_principal_github" {
   type        = string
   description = "Github Service Principal"
