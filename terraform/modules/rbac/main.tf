@@ -28,6 +28,12 @@ resource "azurerm_role_assignment" "report_service_acr" {
   role_definition_name = "AcrPull"
 }
 
+resource "azurerm_role_assignment" "auth_service_acr" {
+  principal_id         = var.auth_app_principal_id
+  scope                = var.acr_id
+  role_definition_name = "AcrPull"
+}
+
 resource "azurerm_role_assignment" "github_spn_report_service_acr" {
   principal_id         = var.github_spn_object_id
   scope                = var.acr_id

@@ -49,10 +49,23 @@ module "report_service" {
   acr_login_server                 = module.acr.login_server
   storage_account_name             = var.storage_account_name
   report_service_token_signing_key = var.report_service_token_signing_key
+  jwt_jwk_set_uri                  = module.auth_service.jwk_set_uri
   report_files_container_name      = module.storage.report_files_container_name
   eventhub_namespace_name          = module.eventhub.namespace_name
   eventhub_name                    = module.eventhub.eventhub_name
   alloy_config                     = file("${path.root}/configs/report-config.alloy")
+}
+
+module "auth_service" {
+  source                       = "./modules/container-apps/auth-service"
+  resource_group_name          = var.resource_group_name
+  container_app_environment_id = module.container_app_environment.id
+  acr_login_server             = module.acr.login_server
+  auth_user_username           = var.auth_user_username
+  auth_user_password           = var.auth_user_password
+  auth_jwt_public_key          = var.auth_jwt_public_key
+  auth_jwt_private_key         = var.auth_jwt_private_key
+  alloy_config                 = file("${path.root}/configs/auth-config.alloy")
 }
 
 module "data_ingest_service" {
@@ -99,6 +112,7 @@ module "rbac" {
   source                  = "./modules/rbac"
   resource_group_name     = var.resource_group_name
   report_app_principal_id = module.report_service.principal_id
+  auth_app_principal_id   = module.auth_service.principal_id
   ingest_app_principal_id = module.data_ingest_service.principal_id
   github_spn_object_id    = data.azuread_service_principal.github_spn.object_id
   eventhub_id             = module.eventhub.eventhub_id

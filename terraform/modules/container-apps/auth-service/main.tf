@@ -1,6 +1,6 @@
-resource "azurerm_container_app" "report_app" {
+resource "azurerm_container_app" "auth_app" {
   container_app_environment_id = var.container_app_environment_id
-  name                         = "app-report-service"
+  name                         = "app-auth-service"
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
@@ -14,8 +14,23 @@ resource "azurerm_container_app" "report_app" {
   }
 
   secret {
-    name  = "jwt-token-signing-key"
-    value = var.report_service_token_signing_key
+    name  = "auth-user-username"
+    value = var.auth_user_username
+  }
+
+  secret {
+    name  = "auth-user-password"
+    value = var.auth_user_password
+  }
+
+  secret {
+    name  = "auth-jwt-public-key"
+    value = var.auth_jwt_public_key
+  }
+
+  secret {
+    name  = "auth-jwt-private-key"
+    value = var.auth_jwt_private_key
   }
 
   template {
@@ -25,41 +40,26 @@ resource "azurerm_container_app" "report_app" {
       cpu    = 0.5
       image  = "${var.acr_login_server}/report-service:latest"
       memory = "1.0Gi"
-      name   = "report-service"
+      name   = "auth-service"
 
       env {
-        name  = "AZURE_STORAGE_BLOB_ACCOUNT_NAME"
-        value = var.storage_account_name
+        name        = "AUTH_USER_USERNAME"
+        secret_name = "auth-user-username"
       }
 
       env {
-        name        = "JWT_TOKEN_SIGNING_KEY"
-        secret_name = "jwt-token-signing-key"
+        name        = "AUTH_USER_PASSWORD"
+        secret_name = "auth-user-password"
       }
 
       env {
-        name  = "JWT_JWK_SET_URI"
-        value = var.jwt_jwk_set_uri
+        name        = "AUTH_JWT_PUBLIC_KEY"
+        secret_name = "auth-jwt-public-key"
       }
 
       env {
-        name  = "AZURE_STORAGE_BLOB_ENDPOINT"
-        value = "https://${var.storage_account_name}.blob.core.windows.net/"
-      }
-
-      env {
-        name  = "AZURE_STORAGE_BLOB_CONTAINER_NAME"
-        value = var.report_files_container_name
-      }
-
-      env {
-        name  = "AZURE_EVENTHUBS_NAMESPACE"
-        value = var.eventhub_namespace_name
-      }
-
-      env {
-        name  = "AZURE_EVENTHUBS_DESTINATION"
-        value = var.eventhub_name
+        name        = "AUTH_JWT_PRIVATE_KEY"
+        secret_name = "auth-jwt-private-key"
       }
 
       volume_mounts {
@@ -72,7 +72,7 @@ resource "azurerm_container_app" "report_app" {
       cpu    = 0.25
       image  = "docker.io/grafana/alloy:latest"
       memory = "0.5Gi"
-      name   = "report-service-alloy"
+      name   = "auth-service-alloy"
 
       env {
         name  = "ALLOY_DEPLOY_MODE"
@@ -109,7 +109,7 @@ resource "azurerm_container_app" "report_app" {
 
   ingress {
     external_enabled = true
-    target_port      = 8080
+    target_port      = 8082
 
     traffic_weight {
       latest_revision = true
