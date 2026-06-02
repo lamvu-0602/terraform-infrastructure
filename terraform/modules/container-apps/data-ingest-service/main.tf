@@ -21,13 +21,13 @@ resource "azurerm_container_app" "ingest_app" {
       custom_rule_type = "azure-eventhub"
 
       metadata = {
-        eventHubNamespace                 = var.eventhub_namespace_name
-        eventHubName                      = var.eventhub_name
-        consumerGroup                     = var.eventhub_consumer_group_name
-        storageAccountName                = var.storage_account_name
-        blobContainer                     = var.eventhub_checkpoint_container_name
-        checkpointStrategy                = "blobMetadata"
-        unprocessedEventThreshold         = "1"
+        eventHubNamespace                   = var.eventhub_namespace_name
+        eventHubName                        = var.eventhub_name
+        consumerGroup                       = var.eventhub_consumer_group_name
+        storageAccountName                  = var.storage_account_name
+        blobContainer                       = var.eventhub_checkpoint_container_name
+        checkpointStrategy                  = "blobMetadata"
+        unprocessedEventThreshold           = "1"
         activationUnprocessedEventThreshold = "0"
       }
 
