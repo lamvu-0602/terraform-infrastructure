@@ -13,6 +13,11 @@ resource "azurerm_container_app" "report_app" {
     value = var.alloy_config
   }
 
+  secret {
+    name  = "jwt-token-signing-key"
+    value = var.report_service_token_signing_key
+  }
+
   template {
     min_replicas = 0
     max_replicas = 10
@@ -28,8 +33,8 @@ resource "azurerm_container_app" "report_app" {
       }
 
       env {
-        name  = "JWT_TOKEN_SIGNING_KEY"
-        value = var.report_service_token_signing_key
+        name        = "JWT_TOKEN_SIGNING_KEY"
+        secret_name = "jwt-token-signing-key"
       }
 
       env {

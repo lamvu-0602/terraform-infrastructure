@@ -8,6 +8,16 @@ resource "azurerm_container_app" "grafana" {
     type = "SystemAssigned"
   }
 
+  secret {
+    name  = "grafana-admin-password"
+    value = var.grafana_admin_password
+  }
+
+  secret {
+    name  = "grafana-postgres-password"
+    value = var.grafana_postgres_password
+  }
+
   template {
     min_replicas = 0
     max_replicas = 5
@@ -23,8 +33,8 @@ resource "azurerm_container_app" "grafana" {
       }
 
       env {
-        name  = "GF_SECURITY_ADMIN_PASSWORD"
-        value = var.grafana_admin_password
+        name        = "GF_SECURITY_ADMIN_PASSWORD"
+        secret_name = "grafana-admin-password"
       }
 
       env {
@@ -83,8 +93,8 @@ resource "azurerm_container_app" "grafana" {
       }
 
       env {
-        name  = "GF_DATABASE_PASSWORD"
-        value = var.grafana_postgres_password
+        name        = "GF_DATABASE_PASSWORD"
+        secret_name = "grafana-postgres-password"
       }
 
       env {
