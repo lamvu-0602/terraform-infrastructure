@@ -29,19 +29,25 @@ variable "grafana_admin_password" {
 }
 
 variable "postgres_user" {
-  type = string
+  type        = string
   description = "Postgres user"
-  default = "grafanaadmin"
+  default     = "grafanaadmin"
 }
 
 variable "grafana_postgres_password" {
   type        = string
   description = "Postgres password"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "report_service_token_signing_key" {
   type        = string
   description = "Jwt secret key"
-  sensitive = true
+  sensitive   = true
+}
+
+variable "service_principal_github" {
+  type        = string
+  description = "Github Service Principal"
+  sensitive   = true
 }
