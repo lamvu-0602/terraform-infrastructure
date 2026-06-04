@@ -30,13 +30,22 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: cd terraform && terraform init
+        working-directory: terraform
+        run: terraform init
 
       - name: Terraform Validate
-        run: cd terraform && terraform validate
+        working-directory: terraform
+        run: terraform validate
 
       - name: Terraform Plan
-        run: cd terraform && terraform plan
+        working-directory: terraform
+        run: terraform plan
+
+      - name: Upload Terraform Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-file
+          path: terraform/tfplan
 
   terraform-apply:
     name: Terraform Apply
@@ -51,9 +60,17 @@ jobs:
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Download Terraform Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-file
+          path: terraform
+
       - name: Terraform Init
-        run: cd terraform && terraform init
+        working-directory: terraform
+        run: terraform init
 
       - name: Terraform Apply
-        run: cd terraform && terraform apply -auto-approve
+        working-directory: terraform
+        run: terraform apply tfplan
 
