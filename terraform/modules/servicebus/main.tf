@@ -11,7 +11,7 @@ resource "azurerm_servicebus_queue" "learning" {
   max_size_in_megabytes = 1024
 
   max_delivery_count = 3
-  requires_session   = true
+  # requires_session   = true | remove because using 'Basic' tier
   # requires_duplicate_detection            = true | remove because using 'Basic' tier
-  # duplicate_detection_history_time_window = "PT10M"
+  # duplicate_detection_history_time_window = "PT10M" | remove because using 'Basic' tier
 }
