@@ -60,6 +60,8 @@ module "report_service" {
   eventhub_namespace_name          = module.eventhub.namespace_name
   eventhub_name                    = module.eventhub.eventhub_name
   alloy_config                     = file("${path.root}/configs/report-config.alloy")
+  servicebus_namespace_name        = module.servicebus.namespace_name
+  servicebus_queue_name            = module.servicebus.queue_name
 }
 
 module "auth_service" {
@@ -88,6 +90,8 @@ module "data_ingest_service" {
   eventhub_checkpoint_container_name = module.storage.eventhub_checkpoint_container_name
   report_files_container_name        = module.storage.report_files_container_name
   alloy_config                       = file("${path.root}/configs/data-ingest-config.alloy")
+  servicebus_namespace_name          = module.servicebus.namespace_name
+  servicebus_queue_name              = module.servicebus.queue_name
 }
 
 module "grafana" {

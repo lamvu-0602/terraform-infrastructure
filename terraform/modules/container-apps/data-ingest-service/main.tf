@@ -84,6 +84,16 @@ resource "azurerm_container_app" "ingest_app" {
         value = var.report_files_container_name
       }
 
+      env {
+        name  = "AZURE_SERVICEBUS_NAMESPACE"
+        value = var.servicebus_namespace_name
+      }
+
+      env {
+        name  = "AZURE_SERVICEBUS_QUEUE_NAME"
+        value = var.servicebus_queue_name
+      }
+
       volume_mounts {
         name = "shared-log-volume"
         path = "/mnt/shared-logs"
