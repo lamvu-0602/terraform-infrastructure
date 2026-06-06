@@ -14,11 +14,19 @@ variable "ingest_app_principal_id" {
   type = string
 }
 
+variable "grafana_principal_id" {
+  type = string
+}
+
 variable "github_spn_object_id" {
   type = string
 }
 
 variable "eventhub_id" {
+  type = string
+}
+
+variable "servicebus_namespace_id" {
   type = string
 }
 

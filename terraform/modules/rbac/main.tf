@@ -22,6 +22,36 @@ resource "azurerm_role_assignment" "github_spn_data_ingest_service_eventhub" {
   role_definition_name = "Azure Event Hubs Data Receiver"
 }
 
+resource "azurerm_role_assignment" "report_service_servicebus" {
+  principal_id         = var.report_app_principal_id
+  scope                = var.servicebus_namespace_id
+  role_definition_name = "Azure Service Bus Data Owner"
+}
+
+resource "azurerm_role_assignment" "auth_service_servicebus" {
+  principal_id         = var.auth_app_principal_id
+  scope                = var.servicebus_namespace_id
+  role_definition_name = "Azure Service Bus Data Owner"
+}
+
+resource "azurerm_role_assignment" "data_ingest_service_servicebus" {
+  principal_id         = var.ingest_app_principal_id
+  scope                = var.servicebus_namespace_id
+  role_definition_name = "Azure Service Bus Data Owner"
+}
+
+resource "azurerm_role_assignment" "grafana_servicebus" {
+  principal_id         = var.grafana_principal_id
+  scope                = var.servicebus_namespace_id
+  role_definition_name = "Azure Service Bus Data Owner"
+}
+
+resource "azurerm_role_assignment" "github_spn_servicebus" {
+  principal_id         = var.github_spn_object_id
+  scope                = var.servicebus_namespace_id
+  role_definition_name = "Azure Service Bus Data Owner"
+}
+
 resource "azurerm_role_assignment" "report_service_acr" {
   principal_id         = var.report_app_principal_id
   scope                = var.acr_id
