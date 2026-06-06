@@ -9,4 +9,9 @@ resource "azurerm_servicebus_queue" "learning" {
   name                  = "report-queue"
   namespace_id          = azurerm_servicebus_namespace.asbn.id
   max_size_in_megabytes = 1024
+
+  max_delivery_count                      = 3
+  requires_session                        = true
+  requires_duplicate_detection            = true
+  duplicate_detection_history_time_window = "PT10M"
 }
