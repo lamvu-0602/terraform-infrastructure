@@ -14,6 +14,12 @@ module "eventhub" {
   location            = var.location
 }
 
+module "servicebus" {
+  source              = "./modules/servicebus"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
 module "cosmosdb" {
   source              = "./modules/cosmosdb"
   resource_group_name = var.resource_group_name
@@ -114,8 +120,10 @@ module "rbac" {
   report_app_principal_id = module.report_service.principal_id
   auth_app_principal_id   = module.auth_service.principal_id
   ingest_app_principal_id = module.data_ingest_service.principal_id
+  grafana_principal_id    = module.grafana.principal_id
   github_spn_object_id    = data.azuread_service_principal.github_spn.object_id
   eventhub_id             = module.eventhub.eventhub_id
+  servicebus_namespace_id = module.servicebus.namespace_id
   acr_id                  = module.acr.id
   cosmos_account_id       = module.cosmosdb.account_id
   cosmos_account_name     = module.cosmosdb.account_name
