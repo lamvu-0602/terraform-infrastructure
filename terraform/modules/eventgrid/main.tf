@@ -1,4 +1,7 @@
 resource "azurerm_eventgrid_system_topic" "storage_topic" {
+  identity {
+    type = "SystemAssigned"
+  }
   name                = "st-blob-events-topic"
   resource_group_name = var.resource_group_name
   location            = var.location
