@@ -128,12 +128,6 @@ resource "azurerm_role_assignment" "batch_ingest_service_acr" {
   role_definition_name = "AcrPull"
 }
 
-resource "azurerm_role_assignment" "github_spn_batch_ingest_service_acr" {
-  principal_id         = var.github_spn_object_id
-  scope                = var.acr_id
-  role_definition_name = "AcrPull"
-}
-
 resource "azurerm_role_assignment" "batch_ingest_service_servicebus" {
   principal_id         = var.batch_ingest_app_principal_id
   scope                = var.servicebus_namespace_id
