@@ -29,9 +29,8 @@ resource "azurerm_container_app" "batch_ingest_app" {
     }
 
     container {
-      cpu = 0.5
-      # image  = "${var.acr_login_server}/batch-ingest-service:latest"
-      image  = "docker.io/library/nginx:latest"
+      cpu    = 0.5
+      image  = "${var.acr_login_server}/batch-ingest-service:latest"
       memory = "1.0Gi"
       name   = "batch-ingest-service"
 
@@ -115,8 +114,8 @@ resource "azurerm_container_app" "batch_ingest_app" {
     }
   }
 
-  # registry {
-  #   server   = var.acr_login_server
-  #   identity = "system"
-  # }
+  registry {
+    server   = var.acr_login_server
+    identity = "system"
+  }
 }
