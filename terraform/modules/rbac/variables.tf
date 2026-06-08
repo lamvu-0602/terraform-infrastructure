@@ -45,3 +45,11 @@ variable "cosmos_account_name" {
 variable "storage_account_id" {
   type = string
 }
+
+variable "eventgrid_system_topic_principal_id" {
+  type = string
+}
+
+variable "batch_ingest_app_principal_id" {
+  type = string
+}

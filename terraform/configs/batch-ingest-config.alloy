@@ -1,0 +1,34 @@
+local.file_match "java_app_logs" {
+  // Updated service_name label to identify the new batch service in Loki
+  path_targets = [{"__address__" = "localhost", "__path__" = "/mnt/shared-logs/*.log", "service_name" = "batch-ingest-service"}]
+}
+
+loki.source.file "ingest_logs" {
+  targets    = local.file_match.java_app_logs.targets
+  forward_to = [loki.write.loki_service.receiver]
+}
+
+loki.write "loki_service" {
+  endpoint {
+    url = "http://app-loki-service:80/loki/api/v1/push"
+  }
+}
+
+prometheus.scrape "java_metrics" {
+  targets = [{
+    "__address__" = "localhost:8081",
+    "service"     = "batch-ingest-service",
+  }]
+
+  metrics_path = "/actuator/prometheus"
+
+  scrape_interval = "15s"
+
+  forward_to = [prometheus.remote_write.prometheus_service.receiver]
+}
+
+prometheus.remote_write "prometheus_service" {
+  endpoint {
+    url = "http://app-prometheus-service:80/api/v1/write"
+  }
+}

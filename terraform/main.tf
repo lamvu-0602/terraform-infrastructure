@@ -118,18 +118,44 @@ module "prometheus" {
   prometheus_config            = file("${path.root}/configs/prometheus.yml")
 }
 
+module "batch_ingest_service" {
+  source                       = "./modules/container-apps/batch-ingest-service"
+  resource_group_name          = var.resource_group_name
+  container_app_environment_id = module.container_app_environment.id
+  acr_login_server             = module.acr.login_server
+  storage_account_name         = var.storage_account_name
+  cosmos_endpoint              = module.cosmosdb.endpoint
+  cosmos_database_name         = module.cosmosdb.database_name
+  report_files_container_name  = module.storage.report_files_container_name
+  alloy_config                 = file("${path.root}/configs/batch-ingest-config.alloy")
+  servicebus_namespace_name    = module.servicebus.namespace_name
+  servicebus_queue_name        = module.servicebus.queue_name
+}
+
+module "eventgrid" {
+  source                      = "./modules/eventgrid"
+  resource_group_name         = var.resource_group_name
+  location                    = var.location
+  storage_account_id          = module.storage.storage_account_id
+  report_files_container_name = module.storage.report_files_container_name
+  servicebus_namespace_id     = module.servicebus.namespace_id
+  servicebus_queue_name       = module.servicebus.queue_name
+}
+
 module "rbac" {
-  source                  = "./modules/rbac"
-  resource_group_name     = var.resource_group_name
-  report_app_principal_id = module.report_service.principal_id
-  auth_app_principal_id   = module.auth_service.principal_id
-  ingest_app_principal_id = module.data_ingest_service.principal_id
-  grafana_principal_id    = module.grafana.principal_id
-  github_spn_object_id    = data.azuread_service_principal.github_spn.object_id
-  eventhub_id             = module.eventhub.eventhub_id
-  servicebus_namespace_id = module.servicebus.namespace_id
-  acr_id                  = module.acr.id
-  cosmos_account_id       = module.cosmosdb.account_id
-  cosmos_account_name     = module.cosmosdb.account_name
-  storage_account_id      = module.storage.storage_account_id
+  source                              = "./modules/rbac"
+  resource_group_name                 = var.resource_group_name
+  report_app_principal_id             = module.report_service.principal_id
+  auth_app_principal_id               = module.auth_service.principal_id
+  ingest_app_principal_id             = module.data_ingest_service.principal_id
+  grafana_principal_id                = module.grafana.principal_id
+  github_spn_object_id                = data.azuread_service_principal.github_spn.object_id
+  eventhub_id                         = module.eventhub.eventhub_id
+  servicebus_namespace_id             = module.servicebus.namespace_id
+  acr_id                              = module.acr.id
+  cosmos_account_id                   = module.cosmosdb.account_id
+  cosmos_account_name                 = module.cosmosdb.account_name
+  storage_account_id                  = module.storage.storage_account_id
+  eventgrid_system_topic_principal_id = module.eventgrid.system_topic_principal_id
+  batch_ingest_app_principal_id       = module.batch_ingest_service.principal_id
 }
